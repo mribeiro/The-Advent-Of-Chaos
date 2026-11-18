@@ -48,11 +48,12 @@
     <div id="modal-body"></div>
   </dialog>
 
-  <aside id="consent" class="consent" aria-label="Analytics consent" hidden>
-    <p><strong>🍪 Cookie-free analytics?</strong> We'd like to count visits and see how people find this site (country, referrer, device) using privacy-friendly <a href="https://www.cloudflare.com/web-analytics/" target="_blank" rel="noopener">Cloudflare Web Analytics</a>. It sets no cookies and doesn't track you across sites. <em>Nothing is collected unless you accept.</em></p>
+  <aside id="consent" class="consent" aria-label="Privacy and analytics" hidden>
+    <p><strong>📊 Privacy &amp; analytics</strong> This site counts visits and how people find it (country, referrer, device) with privacy-friendly <a href="https://www.cloudflare.com/web-analytics/" target="_blank" rel="noopener">Cloudflare Web Analytics</a>. It sets no cookies and doesn't track you across sites. Browsers that send Do Not Track or Global Privacy Control are never counted.</p>
+    <p>Analytics are <em id="consent-status">on</em> for you.</p>
     <div class="consent-actions">
-      <button type="button" id="consent-decline">No thanks</button>
-      <button type="button" id="consent-accept" class="primary">Accept</button>
+      <button type="button" id="consent-close">Close</button>
+      <button type="button" id="consent-toggle" class="primary">Turn off</button>
     </div>
   </aside>
 
