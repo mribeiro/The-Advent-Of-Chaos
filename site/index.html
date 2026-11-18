@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Advent of Chaos</title>
+  <meta name="description" content="A cybersecurity advent calendar: one real breach, hack or attack per day of December. When nothing happened, you get a nerd joke." />
+  <meta property="og:title" content="The Advent of Chaos" />
+  <meta property="og:description" content="24 days. 24 incidents. Zero chill." />
+  <meta name="theme-color" content="#0a0e1a" />
+  <link rel="icon" href="{{ROOT}}favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik+Glitch&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ROOT}}style.css" />
+</head>
+<body data-root="{{ROOT}}" data-year="{{YEAR}}">
+  <canvas id="snow" aria-hidden="true"></canvas>
+
+  <header class="hero">
+    <p class="prompt"><span class="g">root@northpole</span>:<span class="b">~</span>$ tail -f /var/log/chaos <span class="cursor">▋</span></p>
+    <h1 class="logo" data-text="The Advent of Chaos">The Advent of Chaos</h1>
+    <p class="tagline">24 days. 24 incidents. <em>Zero chill.</em></p>
+    <p class="clock" id="clock" aria-live="off"></p>
+    <div id="banner" class="banner" hidden></div>
+  </header>
+
+  <main>
+    <section id="calendar" class="calendar" aria-label="Advent calendar"></section>
+
+    <section class="legend" aria-label="Legend">
+      <span><i class="dot locked"></i>Locked</span>
+      <span><i class="dot searching"></i>Elves scanning</span>
+      <span><i class="dot news"></i>Incident</span>
+      <span><i class="dot joke"></i>Quiet day (joke)</span>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Every day, the elves scan the security news. The first notable breach, hack or attack they find gets wrapped and <strong>frozen forever</strong>. If the day passes quietly (up to 12:00 UTC the day after), you get a nerd joke instead.</p>
+    <p>Summaries are written by an AI and link to the original reporting. All times are UTC.</p>
+    <nav id="archive" class="archive" aria-label="Editions"></nav>
+    <p class="credits"><a href="https://github.com/mribeiro/The-Advent-Of-Chaos" rel="noopener">The Advent of Chaos</a> by Miguel Ribeiro · <a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license noopener">CC BY-NC 4.0</a></p>
+  </footer>
+
+  <dialog id="modal" class="modal">
+    <form method="dialog"><button class="close" aria-label="Close">✕</button></form>
+    <div id="modal-body"></div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="{{ROOT}}app.js"></script>
+</body>
+</html>

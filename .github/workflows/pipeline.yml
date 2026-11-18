@@ -1,0 +1,100 @@
+name: Advent of Chaos
+
+on:
+  schedule:
+    # Every 2 hours during December (UTC). Outside the active window the updater does nothing.
+    - cron: "17 */2 * 12 *"
+    # Monthly keepalive: GitHub disables scheduled workflows after 60 days without repo activity.
+    - cron: "0 6 1 * *"
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  actions: write
+
+concurrency:
+  group: advent-of-chaos
+  cancel-in-progress: false
+
+jobs:
+  update:
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - name: Keep the schedule alive
+        if: github.event.schedule == '0 6 1 * *'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow enable pipeline.yml --repo "$GITHUB_REPOSITORY"
+
+      - name: Look for today's chaos
+        id: update
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node scripts/update.mjs
+
+      - name: Verify no frozen day changed
+        run: node scripts/check-frozen.mjs
+
+      - name: Commit newly frozen days
+        run: |
+          git add data
+          if git diff --cached --quiet; then
+            echo "nothing new"
+            exit 0
+          fi
+          git config user.name "advent-of-chaos-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Freeze $(git diff --cached --name-only | tr '\n' ' ')"
+          git push
+
+      - name: Report updater failures
+        if: steps.update.outcome == 'failure'
+        run: |
+          echo "::error::The updater had errors (see the 'Look for today's chaos' step). Anything it froze was still committed."
+          exit 1
+
+  deploy:
+    needs: update
+    # Deploy on push, or after a scheduled run (even if the updater reported errors).
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
+      - name: Verify no frozen day changed in this push
+        run: node scripts/check-frozen.mjs ${{ github.event_name == 'push' && github.event.before || '' }}
+
+      - name: Build
+        run: node scripts/build.mjs
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,23 @@
+{
+  "name": "advent-of-chaos",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test tests/",
+    "update": "node scripts/update.mjs",
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/check-frozen.mjs",
+    "dev": "node scripts/build.mjs && npx --yes serve@14.2.4 dist -l 4173"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "CC-BY-NC-4.0",
+  "description": "",
+  "type": "module",
+  "private": "true",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.10.0",
+    "fast-xml-parser": "^5.12.1",
+    "zod": "^4.6.7"
+  }
+}
