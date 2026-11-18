@@ -12,7 +12,7 @@ The theme is Christmas mixed with chaos. The site is in English.
 | Curation | The Claude API (Haiku) picks the incident and writes a short, funny summary. Expected cost is cents per month. |
 | Jokes | Claude writes one when a day closes without news. A built-in pool is the fallback. |
 | Infra | A scheduled GitHub Actions workflow fetches feeds, commits frozen JSON and deploys a static build. |
-| Hosting | GitHub Pages (free), with the domain (theadventofchaos.com) registered at Cloudflare and its DNS pointing to GitHub. |
+| Hosting | GitHub Pages (free), with the domain (theadventofchaos.dev) registered at Cloudflare and its DNS pointing to GitHub. |
 | Days | 1–24 |
 | Timezone | UTC for unlocking and for deciding whether something is "news of day D". |
 | Cutoff | Day D keeps searching until D+1 at 12:00 UTC. After that it freezes as a joke if nothing was found. |

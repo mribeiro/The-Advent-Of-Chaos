@@ -32,10 +32,14 @@ The browser only decides which boxes are locked or "scanning". The content comes
 1. **Create the repo.** Make it public (Actions and Pages are free for public repos), then push to `main`.
 2. **Turn on Pages.** Go to Settings → Pages → Build and deployment → Source: **GitHub Actions**.
 3. **Add the API key.** Go to Settings → Secrets and variables → Actions → New repository secret, and save `ANTHROPIC_API_KEY`.
-4. **Connect the domain** (Cloudflare):
-   - In Cloudflare DNS, add `CNAME @ → <github-user>.github.io` and `CNAME www → <github-user>.github.io`. Set both to **DNS only** (grey cloud) so GitHub can issue the HTTPS certificate.
-   - In the repo, go to Settings → Pages → Custom domain, enter `theadventofchaos.com`, then tick **Enforce HTTPS** once it's available.
+4. **Connect the domain** (`theadventofchaos.dev`, DNS on Cloudflare):
+   - In Cloudflare DNS, set every record to **DNS only (grey cloud)** so GitHub can issue and renew the HTTPS certificate:
+     - `A @` → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
+     - `AAAA @` → `2606:50c0:8000::153`, `2606:50c0:8001::153`, `2606:50c0:8002::153`, `2606:50c0:8003::153`
+     - `CNAME www` → `mribeiro.github.io`
+   - Once those resolve, set the repo's Settings → Pages → Custom domain to `theadventofchaos.dev`. Then tick **Enforce HTTPS** when the certificate is ready. `.dev` only loads over HTTPS.
    - Recommended: verify the domain under your GitHub account's Settings → Pages, which protects it against takeover.
+   - If you ever turn on the Cloudflare proxy (orange cloud), use SSL mode **Full (strict)**, never Flexible, because Flexible causes a redirect loop.
 5. **Run it once.** Go to Actions → "Advent of Chaos" → Run workflow. Outside December this only deploys the site with the countdown.
 
 ## Local development
