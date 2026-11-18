@@ -40,7 +40,14 @@ The browser only decides which boxes are locked or "scanning". The content comes
    - Once those resolve, set the repo's Settings → Pages → Custom domain to `theadventofchaos.dev`. Then tick **Enforce HTTPS** when the certificate is ready. `.dev` only loads over HTTPS.
    - Recommended: verify the domain under your GitHub account's Settings → Pages, which protects it against takeover.
    - If you ever turn on the Cloudflare proxy (orange cloud), use SSL mode **Full (strict)**, never Flexible, because Flexible causes a redirect loop.
-5. **Run it once.** Go to Actions → "Advent of Chaos" → Run workflow. Outside December this only deploys the site with the countdown.
+5. **Analytics (optional).** In Cloudflare, go to Analytics & Logs → Web Analytics → Add a site, enter `theadventofchaos.dev`, and choose the manual JS snippet setup (not automatic, because the DNS is grey-cloud). Copy the `token` value from the snippet. In the repo, add it as an Actions **variable** (not a secret, since it's public in the page anyway) named `CF_BEACON_TOKEN`. Then re-run the workflow.
+   - The analytics script loads **only after a visitor clicks Accept**. If they don't respond, or they decline, nothing is loaded. The choice can be changed with the footer's "Privacy & analytics" link.
+   - Without the variable, there's no banner and no analytics.
+6. **Run it once.** Go to Actions → "Advent of Chaos" → Run workflow. Outside December this only deploys the site with the countdown.
+
+## Robots
+
+`site/robots.txt` welcomes search engines and asks AI training and scraping crawlers (GPTBot, ClaudeBot, CCBot, Google-Extended, Bytespider…) to stay out. Well-behaved bots respect it. Enforcing it would require Cloudflare's proxy (orange cloud) plus "Block AI bots".
 
 ## Local development
 

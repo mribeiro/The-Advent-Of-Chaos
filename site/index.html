@@ -14,7 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Rubik+Glitch&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{{ROOT}}style.css" />
 </head>
-<body data-root="{{ROOT}}" data-year="{{YEAR}}">
+<body data-root="{{ROOT}}" data-year="{{YEAR}}" data-cf-token="{{CF_TOKEN}}">
   <canvas id="snow" aria-hidden="true"></canvas>
 
   <header class="hero">
@@ -40,7 +40,7 @@
     <p>Every day, the elves scan the security news. The first notable breach, hack or attack they find gets wrapped and <strong>frozen forever</strong>. If the day passes quietly (up to 12:00 UTC the day after), you get a nerd joke instead.</p>
     <p>Summaries are written by an AI and link to the original reporting. All times are UTC.</p>
     <nav id="archive" class="archive" aria-label="Editions"></nav>
-    <p class="credits"><a href="https://github.com/mribeiro/The-Advent-Of-Chaos" rel="noopener">The Advent of Chaos</a> by Miguel Ribeiro · <a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license noopener">CC BY-NC 4.0</a></p>
+    <p class="credits"><a href="https://github.com/mribeiro/The-Advent-Of-Chaos" rel="noopener">The Advent of Chaos</a> by Miguel Ribeiro · <a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license noopener">CC BY-NC 4.0</a> · <button type="button" class="linklike" id="privacy-link" hidden>Privacy &amp; analytics</button></p>
   </footer>
 
   <dialog id="modal" class="modal">
@@ -48,8 +48,17 @@
     <div id="modal-body"></div>
   </dialog>
 
+  <aside id="consent" class="consent" aria-label="Analytics consent" hidden>
+    <p><strong>🍪 Cookie-free analytics?</strong> We'd like to count visits and see how people find this site (country, referrer, device) using privacy-friendly <a href="https://www.cloudflare.com/web-analytics/" target="_blank" rel="noopener">Cloudflare Web Analytics</a>. It sets no cookies and doesn't track you across sites. <em>Nothing is collected unless you accept.</em></p>
+    <div class="consent-actions">
+      <button type="button" id="consent-decline">No thanks</button>
+      <button type="button" id="consent-accept" class="primary">Accept</button>
+    </div>
+  </aside>
+
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+  <script type="module" src="{{ROOT}}consent.js"></script>
   <script type="module" src="{{ROOT}}app.js"></script>
 </body>
 </html>

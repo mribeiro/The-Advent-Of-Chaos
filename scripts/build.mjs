@@ -42,7 +42,12 @@ fs.writeFileSync(
   JSON.stringify({ years: years.map(Number), builtAt: new Date().toISOString() }),
 );
 
-const html = fs.readFileSync(path.join(SITE, "index.html"), "utf8");
+// Cloudflare Web Analytics site token (public). Optional: without it, no analytics and no consent banner.
+const cfToken = (process.env.CF_BEACON_TOKEN || "").trim();
+if (cfToken && !/^[a-f0-9]{32}$/i.test(cfToken)) throw new Error("CF_BEACON_TOKEN must be a 32-char hex token");
+const html = fs
+  .readFileSync(path.join(SITE, "index.html"), "utf8")
+  .replaceAll("{{CF_TOKEN}}", cfToken);
 fs.writeFileSync(path.join(DIST, "index.html"), html.replaceAll("{{ROOT}}", "./").replaceAll("{{YEAR}}", ""));
 for (const year of years) {
   fs.mkdirSync(path.join(DIST, year), { recursive: true });

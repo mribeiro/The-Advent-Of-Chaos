@@ -90,6 +90,8 @@ jobs:
         run: node scripts/check-frozen.mjs ${{ github.event_name == 'push' && github.event.before || '' }}
 
       - name: Build
+        env:
+          CF_BEACON_TOKEN: ${{ vars.CF_BEACON_TOKEN }}
         run: node scripts/build.mjs
 
       - uses: actions/configure-pages@v5

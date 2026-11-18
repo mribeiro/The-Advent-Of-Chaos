@@ -257,3 +257,29 @@ main { max-width: 1100px; margin: 0 auto; padding: 16px; }
 }
 .credits { margin-top: 18px; font-size: 12px; }
 .credits a { color: var(--muted); }
+
+/* ---------- Consent ---------- */
+.consent {
+  position: fixed; left: 16px; bottom: 16px; z-index: 20;
+  width: min(420px, calc(100vw - 32px));
+  padding: 14px 16px; border-radius: 12px;
+  background: rgba(17, 24, 48, 0.96); border: 1px solid var(--line);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  font-size: 13px; color: var(--muted);
+  animation: slidein 0.3s ease-out;
+}
+.consent[hidden] { display: none; }
+.consent p { margin: 0 0 10px; }
+.consent strong { color: var(--ink); }
+.consent em { color: var(--gold); font-style: normal; }
+.consent a { color: var(--gold); }
+.consent-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.consent-actions button {
+  font: inherit; font-family: var(--mono); font-size: 12px; cursor: pointer;
+  padding: 7px 12px; border-radius: 8px; border: 1px solid var(--line);
+  background: transparent; color: var(--ink);
+}
+.consent-actions button.primary { background: var(--green-deep); border-color: var(--green-deep); color: #fff; }
+.consent-actions button:hover { border-color: var(--gold); }
+@keyframes slidein { from { transform: translateY(20px); opacity: 0; } }
+.linklike { background: none; border: 0; padding: 0; font: inherit; color: var(--muted); text-decoration: underline; cursor: pointer; }
