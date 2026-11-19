@@ -31,6 +31,7 @@
     <p class="prompt"><span class="g">root@northpole</span>:<span class="b">~</span>$ tail -f /var/log/chaos <span class="cursor">▋</span></p>
     <h1 class="logo" data-text="The Advent of Chaos">The Advent of Chaos</h1>
     <p class="tagline"><span class="box-count">24</span> days. <span class="box-count">24</span> incidents. <em>Zero chill.</em></p>
+    <p class="why-wrap"><button type="button" class="why-btn" data-open-about>Why does this exist? <span aria-hidden="true">→</span></button></p>
     <p class="clock" id="clock" aria-live="off"></p>
     <div id="banner" class="banner" hidden></div>
   </header>
@@ -50,12 +51,41 @@
     <p>Every day, the elves scan the security news. The first notable breach, hack or attack they find gets wrapped and <strong>frozen forever</strong>. If the day passes quietly (up to 12:00 UTC the day after), you get a nerd joke instead.</p>
     <p>Summaries are written by an AI and link to the original reporting. All times are UTC.</p>
     <nav id="archive" class="archive" aria-label="Editions"></nav>
-    <p class="credits"><a href="https://github.com/mribeiro/The-Advent-Of-Chaos" rel="noopener">The Advent of Chaos</a> by Miguel Ribeiro · <a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license noopener">CC BY-NC 4.0</a><span id="privacy-wrap" hidden> · <button type="button" class="linklike" id="privacy-link">Privacy &amp; analytics</button></span></p>
+    <p class="credits"><a href="https://github.com/mribeiro/The-Advent-Of-Chaos" rel="noopener">The Advent of Chaos</a> by Miguel Ribeiro · <a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license noopener">CC BY-NC 4.0</a> · <button type="button" class="linklike" data-open-about>Why this exists</button><span id="privacy-wrap" hidden> · <button type="button" class="linklike" id="privacy-link">Privacy &amp; analytics</button></span></p>
   </footer>
 
   <dialog id="modal" class="modal">
     <form method="dialog"><button class="close" aria-label="Close">✕</button></form>
     <div id="modal-body"></div>
+  </dialog>
+
+  <dialog id="about" class="modal about" aria-labelledby="about-title">
+    <form method="dialog"><button class="close" aria-label="Close">✕</button></form>
+    <p class="m-date">README.md · why this exists</p>
+    <h2 id="about-title" class="m-title">Chaos doesn't take December off</h2>
+    <p>Somewhere in the world, right now, a company is finding out it was breached. A password database is being leaked, a ransomware gang is setting a deadline, or a popular package is shipping something it shouldn't. This happens <strong>every single day</strong>, and most of it never reaches the news you read.</p>
+    <p>The Advent of Chaos is a small, festive way of making that visible. Instead of chocolate, each box holds one real incident from that day, so by Christmas you've seen 24 days of what is normally invisible.</p>
+
+    <h3>Why it matters more in the age of AI</h3>
+    <ul>
+      <li><strong>Attacks got cheaper.</strong> AI writes convincing phishing in any language, clones voices and helps find and weaponise bugs faster than ever.</li>
+      <li><strong>The attack surface grew.</strong> Everyone is wiring AI assistants, agents and plugins into their apps and data, often faster than they secure them.</li>
+      <li><strong>Trust is harder.</strong> When a message, a video or a call can be faked, "it looked real" stops being a defence.</li>
+    </ul>
+
+    <h3>Awareness, not fear</h3>
+    <p>The point isn't to scare you. It's that people who know what attacks look like are much harder to fool. A few habits beat most of what you'll see in these boxes:</p>
+    <ul class="habits">
+      <li>🔑 Use a password manager, and passkeys or two-factor wherever you can.</li>
+      <li>⏳ Treat urgency as a red flag. "Act now" is the oldest trick there is.</li>
+      <li>🔄 Install updates. Many boxes here are bugs that already had a fix.</li>
+      <li>💾 Keep backups you could actually restore from.</li>
+      <li>🤖 Be careful what you paste into AI tools, and what you let them do on your behalf.</li>
+    </ul>
+
+    <h3>How the calendar works</h3>
+    <p>Every couple of hours a bot reads the security news, and an AI picks the most notable incident of the day and writes a short summary with links to the original reporting. Once a box is filled it is frozen forever. Quiet days get a nerd joke, because even defenders need a break. 🎄</p>
+    <p class="about-sign">Stay curious, stay patched, and happy holidays.<br><a href="https://github.com/mribeiro/The-Advent-Of-Chaos" rel="noopener">Miguel Ribeiro</a></p>
   </dialog>
 
   <aside id="consent" class="consent" aria-label="Privacy and analytics" hidden>

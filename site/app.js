@@ -361,3 +361,12 @@ async function boot() {
 }
 
 boot();
+
+// ---------- about ----------
+const about = $("#about");
+const openAbout = () => { if (!about.open) about.showModal(); };
+document.querySelectorAll("[data-open-about]").forEach((b) => b.addEventListener("click", openAbout));
+about.addEventListener("click", (e) => { if (e.target === e.currentTarget) about.close(); });
+about.addEventListener("close", () => { if (location.hash === "#why") history.replaceState(null, "", location.pathname + location.search); });
+if (location.hash === "#why") openAbout();
+window.addEventListener("hashchange", () => { if (location.hash === "#why") openAbout(); });
