@@ -1,0 +1,32 @@
+{
+  "day": 1,
+  "date": "2026-11-18",
+  "type": "news",
+  "frozenAt": "2026-11-19T00:27:34.220Z",
+  "model": "claude-haiku-5-5",
+  "news": {
+    "notability": 7,
+    "headline": "Microsoft's Agent Framework PyPI package hijacked to steal developer cloud credentials",
+    "summary": "Attackers compromised Microsoft's official Agent Framework Python package on PyPI and published two malicious versions. According to SecurityWeek, the releases (1.26.1 and 1.26.2) steal Azure, Azure DevOps and GitHub Actions credentials when Python starts. The Register reports that a GitHub organization admin's credentials were compromised.",
+    "chaosTwist": "Santa's elves were told to trust only the official workshop toolbox, but this one slipped a sack of stolen keys into the sleigh when Python started up.",
+    "naughtyLevel": 4,
+    "category": "supply-chain",
+    "sources": [
+      {
+        "title": "Microsoft’s Agent Framework PyPI package compromised to steal credentials",
+        "url": "https://www.bleepingcomputer.com/news/security/microsofts-agent-framework-pypi-package-compromised-to-steal-credentials/",
+        "outlet": "BleepingComputer"
+      },
+      {
+        "title": "Microsoft's official Python agent framework hijacked to distribute malware",
+        "url": "https://www.theregister.com/security/2026/11/18/microsofts-official-python-agent-framework-hijacked-to-distribute-malware/5310858",
+        "outlet": "The Register"
+      },
+      {
+        "title": "Microsoft Agent Framework Releases Poisoned With Credential Stealer",
+        "url": "https://www.securityweek.com/microsoft-agent-framework-releases-poisoned-with-credential-stealer/",
+        "outlet": "SecurityWeek"
+      }
+    ]
+  }
+}
