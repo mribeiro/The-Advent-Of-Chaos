@@ -1,12 +1,13 @@
 #!/usr/bin/env node
-// Daily routine: looks for each open day's incident and freezes it into data/<year>/<DD>.json.
-// A frozen file is never rewritten. Files are created with the exclusive 'wx' flag.
+// Routine: for every active edition, looks for each open box's incident and freezes it into
+// data/<edition>/<NN>.json. A frozen file is never rewritten. Files are created with the 'wx' flag.
 //
 // Usage: node scripts/update.mjs [--now ISO] [--data-dir dir] [--fixture items.json] [--mock-ai] [--dry-run]
+//                                [--only id,id]   (restrict to some editions, e.g. for tests)
 import fs from "node:fs";
 import path from "node:path";
 import { parseArgs } from "node:util";
-import { FIRST_DAY, LAST_DAY, phase, isOnDay, isoDate, pad2, dayCutoff } from "./lib/time.mjs";
+import { editionsAt, phase, isOnBox, boxDate, boxStart, boxCutoff, pad2, EDITION_DIR_RE } from "./lib/editions.mjs";
 import { fetchAllFeeds } from "./lib/feeds.mjs";
 import { pickIncident, writeJoke, rejectJoke, hasApiKey, MODEL } from "./lib/curate.mjs";
 import { JOKE_POOL } from "./lib/joke-pool.mjs";
@@ -22,34 +23,36 @@ const { values: args } = parseArgs({
     fixture: { type: "string" },
     "mock-ai": { type: "boolean", default: false },
     "dry-run": { type: "boolean", default: false },
+    only: { type: "string" },
   },
 });
 
 const now = args.now ? new Date(args.now) : new Date();
 if (isNaN(now)) throw new Error(`invalid --now: ${args.now}`);
-const year = now.getUTCFullYear();
-const yearDir = path.join(args["data-dir"], String(year));
-const dayFile = (day) => path.join(yearDir, `${pad2(day)}.json`);
+const only = args.only ? new Set(args.only.split(",")) : null;
+const editions = editionsAt(now).filter((ed) => !only || only.has(ed.id));
+const edDir = (ed) => path.join(args["data-dir"], ed.id);
+const boxFile = (ed, n) => path.join(edDir(ed), `${pad2(n)}.json`);
 
 const log = (...a) => console.log(`[${now.toISOString()}]`, ...a);
 
-function loadFrozen() {
+function loadFrozen(ed) {
   const out = {};
-  for (let d = FIRST_DAY; d <= LAST_DAY; d++) {
-    if (fs.existsSync(dayFile(d))) out[d] = JSON.parse(fs.readFileSync(dayFile(d), "utf8"));
+  for (let n = 1; n <= ed.boxes; n++) {
+    if (fs.existsSync(boxFile(ed, n))) out[n] = JSON.parse(fs.readFileSync(boxFile(ed, n), "utf8"));
   }
   return out;
 }
 
-function freeze(day, entry) {
+function freeze(ed, n, entry) {
   if (args["dry-run"]) {
-    log(`(dry-run) would freeze day ${day}:`, JSON.stringify(entry, null, 2));
+    log(`(dry-run) would freeze ${ed.id} box ${n}:`, JSON.stringify(entry, null, 2));
     return;
   }
-  fs.mkdirSync(yearDir, { recursive: true });
-  // 'wx' fails if the file already exists, so a frozen day can never be overwritten.
-  fs.writeFileSync(dayFile(day), JSON.stringify(entry, null, 2) + "\n", { flag: "wx" });
-  log(`froze day ${day} as ${entry.type}`);
+  fs.mkdirSync(edDir(ed), { recursive: true });
+  // 'wx' fails if the file already exists, so a frozen box can never be overwritten.
+  fs.writeFileSync(boxFile(ed, n), JSON.stringify(entry, null, 2) + "\n", { flag: "wx" });
+  log(`froze ${ed.id} box ${n} (${entry.date}) as ${entry.type}`);
 }
 
 // --- offline stand-ins, for tests and simulations --------------------------------
@@ -77,12 +80,12 @@ function poolJoke(previousJokes) {
   return fresh.length ? fresh[Math.floor(Math.random() * fresh.length)] : null;
 }
 
-/** Jokes from every edition (all years), so a joke is never reused. */
+/** Jokes from every edition (all years and extras), so a joke is never reused. */
 function allPreviousJokes() {
   const root = args["data-dir"];
   const out = [];
   for (const y of fs.existsSync(root) ? fs.readdirSync(root) : []) {
-    if (!/^\d{4}$/.test(y)) continue;
+    if (!EDITION_DIR_RE.test(y) || !fs.statSync(path.join(root, y)).isDirectory()) continue;
     for (const f of fs.readdirSync(path.join(root, y))) {
       if (!/^\d{2}\.json$/.test(f)) continue;
       const e = JSON.parse(fs.readFileSync(path.join(root, y, f), "utf8"));
@@ -104,104 +107,106 @@ async function loadItems() {
 }
 
 async function main() {
-  const frozen = loadFrozen();
-  const openDays = [];
-  for (let d = FIRST_DAY; d <= LAST_DAY; d++) {
-    const p = phase(year, d, now);
-    if (p !== "locked" && !frozen[d]) openDays.push({ day: d, phase: p });
+  // Collect the open boxes of every edition.
+  const work = [];
+  for (const ed of editions) {
+    if (now < boxStart(ed, 1)) continue;
+    const frozen = loadFrozen(ed);
+    const open = [];
+    for (let n = 1; n <= ed.boxes; n++) {
+      const p = phase(ed, n, now);
+      if (p !== "locked" && !frozen[n]) open.push({ n, phase: p });
+    }
+    if (open.length) work.push({ ed, frozen, open });
+    else log(`${ed.id}: nothing to do (${Object.keys(frozen).length}/${ed.boxes} boxes frozen)`);
   }
-  if (!openDays.length) {
-    log(`nothing to do for ${year} (${Object.keys(frozen).length} days frozen)`);
-    return;
-  }
-  log(`open days: ${openDays.map((o) => `${o.day}(${o.phase})`).join(", ")}`);
+  if (!work.length) return;
 
   const useAi = !args["mock-ai"] && hasApiKey();
-  if (!useAi && !args["mock-ai"]) log("WARNING: no ANTHROPIC_API_KEY. News can't be curated; closed days get pool jokes.");
+  if (!useAi && !args["mock-ai"]) log("WARNING: no ANTHROPIC_API_KEY. News can't be curated; closed boxes get pool jokes.");
   const pick = args["mock-ai"] ? mockPick : useAi ? pickIncident : null;
 
   const items = await loadItems();
   log(`${items.length} feed items loaded`);
 
-  const usedUrls = new Set();
-  const usedHeadlines = [];
+  // Jokes are unique across ALL editions; incidents are unique within an edition.
   const previousJokes = allPreviousJokes();
-  for (const e of Object.values(frozen)) {
-    if (e.type === "news") {
-      usedHeadlines.push(e.news.headline);
-      e.news.sources.forEach((s) => usedUrls.add(s.url));
-    }
-  }
-
   let failures = 0;
-  for (const { day, phase: ph } of openDays) {
-    const date = isoDate(year, day);
-    const candidates = items
-      // Ignore future-dated items (bad feed timestamps, or the future in a simulation).
-      .filter((it) => isOnDay(it.published, year, day) && it.published <= now && !usedUrls.has(it.url))
-      .sort((a, b) => b.published - a.published)
-      .slice(0, MAX_CANDIDATES);
-    log(`day ${day} [${ph}]: ${candidates.length} candidates`);
 
-    let pickResult = null;
-    let curationError = false;
-    if (candidates.length && pick) {
-      try {
-        pickResult = await pick({ date, candidates, used: usedHeadlines });
-        log(
-          `day ${day}: ` +
-            (pickResult.found
-              ? `picked "${pickResult.headline}" notability=${pickResult.notability} (needs ${THRESHOLD[ph]})`
-              : "no real incident") +
-            ` | ${pickResult.reasoning}`,
-        );
-      } catch (err) {
-        failures++;
-        curationError = true;
-        console.error(`day ${day}: curation failed: ${err.message}`);
+  for (const { ed, frozen, open } of work) {
+    log(`${ed.id}: open boxes ${open.map((o) => `${o.n}(${o.phase})`).join(", ")}`);
+    const usedUrls = new Set();
+    const usedHeadlines = [];
+    for (const e of Object.values(frozen)) {
+      if (e.type === "news") {
+        usedHeadlines.push(e.news.headline);
+        e.news.sources.forEach((s) => usedUrls.add(s.url));
       }
     }
 
-    if (pickResult?.found && pickResult.notability >= THRESHOLD[ph]) {
-      const { found, reasoning, ...news } = pickResult;
-      freeze(day, {
-        day,
-        date,
-        type: "news",
-        frozenAt: now.toISOString(),
-        model: args["mock-ai"] ? "mock" : MODEL,
-        news,
-      });
-      usedHeadlines.push(news.headline);
-      news.sources.forEach((s) => usedUrls.add(s.url));
-      continue;
-    }
+    for (const { n, phase: ph } of open) {
+      const date = boxDate(ed, n);
+      const tag = `${ed.id} box ${n} (${date}) [${ph}]`;
+      const candidates = items
+        // Ignore future-dated items (bad feed timestamps, or the future in a simulation).
+        .filter((it) => isOnBox(it.published, ed, n) && it.published <= now && !usedUrls.has(it.url))
+        .sort((a, b) => b.published - a.published)
+        .slice(0, MAX_CANDIDATES);
+      log(`${tag}: ${candidates.length} candidates`);
 
-    // If the API failed, give it up to 24h past the cutoff before settling for a joke.
-    if (ph === "closed" && curationError && now - dayCutoff(year, day) < 24 * 3600_000) {
-      log(`day ${day}: closed, but curation failed. Retrying on the next run before falling back to a joke`);
-      continue;
-    }
-    if (ph === "closed") {
-      let joke;
-      let source = "pool";
-      if (useAi) {
+      let pickResult = null;
+      let curationError = false;
+      if (candidates.length && pick) {
         try {
-          joke = await writeJoke({ previousJokes });
-          source = MODEL;
+          pickResult = await pick({ date, candidates, used: usedHeadlines });
+          log(
+            `${tag}: ` +
+              (pickResult.found
+                ? `picked "${pickResult.headline}" notability=${pickResult.notability} (needs ${THRESHOLD[ph]})`
+                : "no real incident") +
+              ` | ${pickResult.reasoning}`,
+          );
         } catch (err) {
           failures++;
-          console.error(`day ${day}: joke generation failed, using pool: ${err.message}`);
+          curationError = true;
+          console.error(`${tag}: curation failed: ${err.message}`);
         }
       }
-      joke ??= poolJoke(previousJokes);
-      if (!joke) {
-        failures++;
-        console.error(`day ${day}: no fresh joke available (API failed and pool exhausted). Retrying on the next run`);
+
+      if (pickResult?.found && pickResult.notability >= THRESHOLD[ph]) {
+        const { found, reasoning, ...news } = pickResult;
+        freeze(ed, n, { day: n, date, type: "news", frozenAt: now.toISOString(), model: args["mock-ai"] ? "mock" : MODEL, news });
+        usedHeadlines.push(news.headline);
+        news.sources.forEach((s) => usedUrls.add(s.url));
         continue;
       }
-      freeze(day, { day, date, type: "joke", frozenAt: now.toISOString(), model: source, joke });
-      previousJokes.push(joke);
+
+      // If the API failed, give it up to 24h past the cutoff before settling for a joke.
+      if (ph === "closed" && curationError && now - boxCutoff(ed, n) < 24 * 3600_000) {
+        log(`${tag}: closed, but curation failed. Retrying on the next run before falling back to a joke`);
+        continue;
+      }
+      if (ph === "closed") {
+        let joke;
+        let source = "pool";
+        if (useAi) {
+          try {
+            joke = await writeJoke({ previousJokes });
+            source = MODEL;
+          } catch (err) {
+            failures++;
+            console.error(`${tag}: joke generation failed, using pool: ${err.message}`);
+          }
+        }
+        joke ??= poolJoke(previousJokes);
+        if (!joke) {
+          failures++;
+          console.error(`${tag}: no fresh joke available (API failed and pool exhausted). Retrying on the next run`);
+          continue;
+        }
+        freeze(ed, n, { day: n, date, type: "joke", frozenAt: now.toISOString(), model: source, joke });
+        previousJokes.push(joke);
+      }
     }
   }
   if (failures) process.exitCode = 1;

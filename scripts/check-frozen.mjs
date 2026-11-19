@@ -7,6 +7,7 @@
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import { EDITION_DIR_RE } from "./lib/editions.mjs";
 
 const base = process.argv[2];
 const git = (...a) => execFileSync("git", a, { encoding: "utf8" });
@@ -22,7 +23,7 @@ const violations = diff
   .split("\n")
   .filter(Boolean)
   .map((l) => l.split("\t"))
-  .filter(([status, file]) => status !== "A" && /^data\/\d{4}\/\d{2}\.json$/.test(file));
+  .filter(([status, file]) => status !== "A" && /^data\/[a-z0-9-]+\/\d{2}\.json$/.test(file));
 
 let ok = true;
 for (const [status, file] of violations) {
@@ -33,7 +34,7 @@ for (const [status, file] of violations) {
 // Validate shape of all day files.
 const isStr = (v) => typeof v === "string" && v.length > 0;
 for (const year of fs.existsSync("data") ? fs.readdirSync("data") : []) {
-  if (!/^\d{4}$/.test(year)) continue;
+  if (!EDITION_DIR_RE.test(year) || !fs.statSync(path.join("data", year)).isDirectory()) continue;
   for (const f of fs.readdirSync(path.join("data", year))) {
     const file = path.join("data", year, f);
     try {

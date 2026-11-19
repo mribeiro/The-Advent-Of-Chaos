@@ -46,6 +46,12 @@ The browser only decides which boxes are locked or "scanning". The content comes
    - Without the variable, there's no banner and no analytics.
 6. **Run it once.** Go to Actions → "Advent of Chaos" → Run workflow. Outside December this only deploys the site with the countdown.
 
+## Hidden trial run
+
+`scripts/lib/editions.mjs` defines extra editions. The **trial** covers 18–30 Nov 2026 (13 boxes) with the same rules, and its data lives in `data/trial/`. It's published only at a secret path taken from the `TAOC_TRIAL_SLUG` repo **secret** (secrets are masked in the public Actions logs), with `noindex`, and it's never listed in `editions.json`. Locally, `npm run dev` serves it at `/trial-local/`. It's hidden from casual visitors, not truly secret: anyone with access to the deploy artifacts could find it.
+
+Incidents are deduplicated within each edition, so the trial and the real calendar can feature the same story. Jokes are unique across all editions.
+
 ## Robots
 
 `site/robots.txt` welcomes search engines and asks AI training and scraping crawlers (GPTBot, ClaudeBot, CCBot, Google-Extended, Bytespider…) to stay out. Well-behaved bots respect it. Enforcing it would require Cloudflare's proxy (orange cloud) plus "Block AI bots".

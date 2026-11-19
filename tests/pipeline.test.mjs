@@ -4,7 +4,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
-import { phase } from "../scripts/lib/time.mjs";
+import { phase, yearEdition, EXTRA_EDITIONS, boxDate } from "../scripts/lib/editions.mjs";
 import { parseFeed } from "../scripts/lib/feeds.mjs";
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "taoc-"));
@@ -20,21 +20,29 @@ fs.writeFileSync(
   ]),
 );
 
-const run = (now) =>
+const run = (now, only = "2026") =>
   execFileSync(
     process.execPath,
-    ["scripts/update.mjs", "--now", now, "--data-dir", dataDir, "--fixture", fixture, "--mock-ai"],
+    ["scripts/update.mjs", "--now", now, "--data-dir", dataDir, "--fixture", fixture, "--mock-ai", "--only", only],
     { encoding: "utf8", env: { ...process.env, ANTHROPIC_API_KEY: "" } },
   );
 const file = (d) => path.join(dataDir, "2026", `${String(d).padStart(2, "0")}.json`);
 const read = (d) => JSON.parse(fs.readFileSync(file(d), "utf8"));
 
+const y2026 = yearEdition(2026);
 test("phases", () => {
-  assert.equal(phase(2026, 5, new Date("2026-12-04T23:59:59Z")), "locked");
-  assert.equal(phase(2026, 5, new Date("2026-12-05T00:00:00Z")), "live");
-  assert.equal(phase(2026, 5, new Date("2026-12-06T11:59:59Z")), "grace");
-  assert.equal(phase(2026, 5, new Date("2026-12-06T12:00:00Z")), "closed");
-  assert.equal(phase(2026, 24, new Date("2026-12-25T12:00:00Z")), "closed");
+  assert.equal(phase(y2026, 5, new Date("2026-12-04T23:59:59Z")), "locked");
+  assert.equal(phase(y2026, 5, new Date("2026-12-05T00:00:00Z")), "live");
+  assert.equal(phase(y2026, 5, new Date("2026-12-06T11:59:59Z")), "grace");
+  assert.equal(phase(y2026, 5, new Date("2026-12-06T12:00:00Z")), "closed");
+  assert.equal(phase(y2026, 24, new Date("2026-12-25T12:00:00Z")), "closed");
+});
+
+test("trial edition covers 18-30 Nov", () => {
+  const trial = EXTRA_EDITIONS.find((e) => e.id === "trial");
+  assert.equal(boxDate(trial, 1), "2026-11-18");
+  assert.equal(boxDate(trial, trial.boxes), "2026-11-30");
+  assert.equal(phase(trial, 13, new Date("2026-12-01T11:59:00Z")), "grace");
 });
 
 test("before December nothing is frozen", () => {
@@ -108,7 +116,7 @@ test("jokes are never reused across editions; an exhausted pool keeps searching 
   const items = path.join(dir, "none.json");
   fs.writeFileSync(items, "[]");
   const go = (now) =>
-    execFileSync(process.execPath, ["scripts/update.mjs", "--now", now, "--data-dir", dir, "--fixture", items, "--mock-ai"], {
+    execFileSync(process.execPath, ["scripts/update.mjs", "--now", now, "--data-dir", dir, "--fixture", items, "--mock-ai", "--only", now.slice(0, 4)], {
       env: { ...process.env, ANTHROPIC_API_KEY: "" },
       stdio: "pipe",
     });
@@ -126,4 +134,21 @@ test("jokes are never reused across editions; an exhausted pool keeps searching 
   assert.throws(() => go("2027-12-25T13:00:00Z"));
   assert.equal(setups(2027).length, 6);
   assert.equal(new Set([...all, ...setups(2027)]).size, 30);
+});
+
+test("trial edition freezes into its own folder, separately from the yearly edition", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "taoc-trial-"));
+  const items = path.join(dir, "items.json");
+  fs.writeFileSync(items, JSON.stringify([
+    { source: "T", title: "Hospital chain breach exposes patients", url: "https://ex.com/t1", published: "2026-11-18T09:00:00Z", excerpt: "x" },
+  ]));
+  execFileSync(process.execPath, ["scripts/update.mjs", "--now", "2026-11-20T13:00:00Z", "--data-dir", dir, "--fixture", items, "--mock-ai"], {
+    env: { ...process.env, ANTHROPIC_API_KEY: "" },
+  });
+  const files = fs.readdirSync(path.join(dir, "trial")).sort();
+  assert.deepEqual(files, ["01.json", "02.json"]); // Nov 18 news, Nov 19 joke; Nov 20 still live
+  const b1 = JSON.parse(fs.readFileSync(path.join(dir, "trial", "01.json"), "utf8"));
+  assert.equal(b1.type, "news");
+  assert.equal(b1.date, "2026-11-18");
+  assert.equal(fs.existsSync(path.join(dir, "2026")), false, "December edition untouched");
 });

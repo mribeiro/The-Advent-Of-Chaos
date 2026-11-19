@@ -7,7 +7,7 @@
     "update": "node scripts/update.mjs",
     "build": "node scripts/build.mjs",
     "check": "node scripts/check-frozen.mjs",
-    "dev": "node scripts/build.mjs && npx --yes serve@14.2.4 dist -l 4173"
+    "dev": "TAOC_TRIAL_SLUG=trial-local node scripts/build.mjs && npx --yes serve@14.2.4 dist -l 4173"
   },
   "keywords": [],
   "author": "",

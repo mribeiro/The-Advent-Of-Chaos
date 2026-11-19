@@ -2,8 +2,9 @@ name: Advent of Chaos
 
 on:
   schedule:
-    # Every 2 hours during December (UTC). Outside the active window the updater does nothing.
-    - cron: "17 */2 * 12 *"
+    # Every 2 hours during November (hidden trial run) and December (UTC).
+    # Outside an edition's window the updater does nothing.
+    - cron: "17 */2 * 11,12 *"
     # Monthly keepalive: GitHub disables scheduled workflows after 60 days without repo activity.
     - cron: "0 6 1 * *"
   push:
@@ -92,6 +93,8 @@ jobs:
       - name: Build
         env:
           CF_BEACON_TOKEN: ${{ vars.CF_BEACON_TOKEN }}
+          # Secret so the hidden trial's URL is masked in public logs.
+          TAOC_TRIAL_SLUG: ${{ secrets.TAOC_TRIAL_SLUG }}
         run: node scripts/build.mjs
 
       - uses: actions/configure-pages@v5
