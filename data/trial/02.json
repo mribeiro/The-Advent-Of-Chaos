@@ -1,0 +1,22 @@
+{
+  "day": 2,
+  "date": "2026-11-19",
+  "type": "news",
+  "frozenAt": "2026-11-19T10:25:07.258Z",
+  "model": "claude-haiku-5-5",
+  "news": {
+    "notability": 7,
+    "headline": "Rakuten Securities discloses breach exposing account details of up to 15 million customers",
+    "summary": "Japanese brokerage Rakuten Securities has disclosed a data breach involving account details belonging to about 15 million customers. The reported exposure covers customer account information, and the coverage frames the figure as the number of customers potentially affected. The source material gives no further details on how the intrusion happened.",
+    "chaosTwist": "Somewhere in Tokyo, a stock-trading elf just realized Santa's naughty list was never meant to be sold on the open market.",
+    "naughtyLevel": 4,
+    "category": "breach",
+    "sources": [
+      {
+        "title": "Rakuten Securities Breach Could Impact 15 Million Customers",
+        "url": "https://www.infosecurity-magazine.com/news/rakuten-securities-breach-15/",
+        "outlet": "Infosecurity Magazine"
+      }
+    ]
+  }
+}
