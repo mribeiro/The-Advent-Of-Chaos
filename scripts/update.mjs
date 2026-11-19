@@ -8,7 +8,7 @@ import path from "node:path";
 import { parseArgs } from "node:util";
 import { FIRST_DAY, LAST_DAY, phase, isOnDay, isoDate, pad2, dayCutoff } from "./lib/time.mjs";
 import { fetchAllFeeds } from "./lib/feeds.mjs";
-import { pickIncident, writeJoke, hasApiKey, MODEL } from "./lib/curate.mjs";
+import { pickIncident, writeJoke, rejectJoke, hasApiKey, MODEL } from "./lib/curate.mjs";
 import { JOKE_POOL } from "./lib/joke-pool.mjs";
 
 /** Minimum notability needed to freeze news, per phase. */
@@ -71,11 +71,25 @@ async function mockPick({ candidates }) {
   };
 }
 
+/** A pool joke never used in any edition, or null when the pool is exhausted. */
 function poolJoke(previousJokes) {
-  const used = new Set(previousJokes.map((j) => j.setup));
-  const fresh = JOKE_POOL.filter((j) => !used.has(j.setup));
-  const list = fresh.length ? fresh : JOKE_POOL;
-  return list[Math.floor(Math.random() * list.length)];
+  const fresh = JOKE_POOL.filter((j) => !rejectJoke(j, previousJokes));
+  return fresh.length ? fresh[Math.floor(Math.random() * fresh.length)] : null;
+}
+
+/** Jokes from every edition (all years), so a joke is never reused. */
+function allPreviousJokes() {
+  const root = args["data-dir"];
+  const out = [];
+  for (const y of fs.existsSync(root) ? fs.readdirSync(root) : []) {
+    if (!/^\d{4}$/.test(y)) continue;
+    for (const f of fs.readdirSync(path.join(root, y))) {
+      if (!/^\d{2}\.json$/.test(f)) continue;
+      const e = JSON.parse(fs.readFileSync(path.join(root, y, f), "utf8"));
+      if (e.type === "joke") out.push(e.joke);
+    }
+  }
+  return out;
 }
 // -----------------------------------------------------------------------------
 
@@ -111,12 +125,12 @@ async function main() {
 
   const usedUrls = new Set();
   const usedHeadlines = [];
-  const previousJokes = [];
+  const previousJokes = allPreviousJokes();
   for (const e of Object.values(frozen)) {
     if (e.type === "news") {
       usedHeadlines.push(e.news.headline);
       e.news.sources.forEach((s) => usedUrls.add(s.url));
-    } else if (e.type === "joke") previousJokes.push(e.joke);
+    }
   }
 
   let failures = 0;
@@ -181,6 +195,11 @@ async function main() {
         }
       }
       joke ??= poolJoke(previousJokes);
+      if (!joke) {
+        failures++;
+        console.error(`day ${day}: no fresh joke available (API failed and pool exhausted). Retrying on the next run`);
+        continue;
+      }
       freeze(day, { day, date, type: "joke", frozenAt: now.toISOString(), model: source, joke });
       previousJokes.push(joke);
     }

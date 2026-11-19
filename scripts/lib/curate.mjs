@@ -48,7 +48,46 @@ Your job:
    - naughty_level: 1-5 (how badly the attackers belong on the naughty list)
    - reasoning: one sentence for the maintainers explaining your choice.`;
 
-const JOKE_SYSTEM = `You write jokes for "The Advent of Chaos", a Christmas-themed advent calendar for IT and security nerds. On days without a notable security incident, the box shows a nerdy IT joke instead. Write ONE original, short joke (setup + punchline) about programming, sysadmin life, networking, security, or tech culture. A Christmas flavour is welcome but optional. Keep it clean, clever, and not a repeat of the previously used jokes.`;
+export const JOKE_LIMITS = { setupWords: 22, punchlineWords: 14 };
+
+const JOKE_SYSTEM = `You write jokes for "The Advent of Chaos", a Christmas-themed advent calendar for IT and security nerds. On days without a notable security incident, the box shows a nerdy IT joke instead.
+
+Write ONE original joke (setup + punchline) on the topic you are given.
+Rules:
+- The punchline must be SHORT and PUNCHY: at most ${JOKE_LIMITS.punchlineWords} words, ideally 4-10. A twist, pun or reveal, never an explanation.
+- The setup must be at most ${JOKE_LIMITS.setupWords} words.
+- It must be genuinely new: not a variation of any previously used joke (same pun, same premise or same punchline counts as a repeat), and not a well-known stock joke.
+- Clever and clean. A Christmas flavour is welcome but optional.`;
+
+const JOKE_TOPICS = [
+  "DNS", "regular expressions", "git merge conflicts", "Kubernetes", "IPv6", "off-by-one errors", "caching",
+  "TCP handshakes", "password policies", "phishing training", "legacy COBOL", "Excel as a database", "YAML indentation",
+  "printer drivers", "on-call pager duty", "the cloud being someone else's computer", "floating point math", "time zones",
+  "Unicode and emoji", "CSS centering", "JavaScript type coercion", "null pointers", "recursion", "Big O notation",
+  "SSL certificate expiry", "backups nobody tested", "two-factor authentication", "VPNs", "zero-day exploits",
+  "bug bounty hunters", "pentesters", "SQL injection", "Linux file permissions", "vim vs emacs", "tabs vs spaces",
+  "microservices", "blockchain hype", "AI chatbots", "code reviews", "technical debt", "Friday deployments",
+  "stand-up meetings", "agile story points", "README files", "Stack Overflow", "segfaults", "memory leaks",
+  "garbage collection", "race conditions", "load balancers", "firewalls", "honeypots", "ransomware negotiations",
+  "the intern with prod access", "rubber duck debugging", "keyboard shortcuts", "dark mode", "USB sticks in the parking lot",
+  "captchas", "cookie banners", "404 pages", "HTTP status codes", "Wi-Fi passwords", "smart home gadgets",
+  "mechanical keyboards", "Raspberry Pi projects", "the BOFH", "change advisory boards", "documentation",
+];
+
+export const jokeKey = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+const words = (s) => s.trim().split(/\s+/).filter(Boolean).length;
+
+/** Returns a reason the joke is unacceptable, or null if it's fine. */
+export function rejectJoke(joke, previousJokes) {
+  if (!joke.setup || !joke.punchline) return "setup or punchline is empty";
+  if (words(joke.punchline) > JOKE_LIMITS.punchlineWords)
+    return `punchline has ${words(joke.punchline)} words (max ${JOKE_LIMITS.punchlineWords})`;
+  if (words(joke.setup) > JOKE_LIMITS.setupWords) return `setup has ${words(joke.setup)} words (max ${JOKE_LIMITS.setupWords})`;
+  const setups = new Set(previousJokes.map((j) => jokeKey(j.setup)));
+  const punches = new Set(previousJokes.map((j) => jokeKey(j.punchline)));
+  if (setups.has(jokeKey(joke.setup)) || punches.has(jokeKey(joke.punchline))) return "it repeats a previous joke";
+  return null;
+}
 
 let client;
 const getClient = () => (client ??= new Anthropic({ maxRetries: 3, timeout: 120_000 }));
@@ -117,6 +156,20 @@ export async function writeJoke({ previousJokes }) {
   const prev = previousJokes.length
     ? previousJokes.map((j) => `- ${j.setup} / ${j.punchline}`).join("\n")
     : "(none yet)";
-  const out = await structured(JOKE_SYSTEM, `Previously used jokes (don't repeat):\n${prev}`, JokeSchema, 2000);
-  return { setup: out.setup.trim(), punchline: out.punchline.trim() };
+  const usedTopics = new Set(previousJokes.map((j) => j.topic).filter(Boolean));
+  const fresh = JOKE_TOPICS.filter((t) => !usedTopics.has(t));
+  const pool = fresh.length ? fresh : JOKE_TOPICS;
+  const feedback = [];
+  for (let attempt = 1; attempt <= 4; attempt++) {
+    const topic = pool[Math.floor(Math.random() * pool.length)];
+    const prompt =
+      `Topic: ${topic}\n\nPreviously used jokes (never repeat or rework these):\n${prev}` +
+      (feedback.length ? `\n\nRejected attempts:\n${feedback.join("\n")}` : "");
+    const out = await structured(JOKE_SYSTEM, prompt, JokeSchema, 2000);
+    const joke = { setup: out.setup.trim(), punchline: out.punchline.trim(), topic };
+    const reason = rejectJoke(joke, previousJokes);
+    if (!reason) return joke;
+    feedback.push(`- "${joke.setup} / ${joke.punchline}" was rejected: ${reason}`);
+  }
+  throw new Error(`no acceptable joke after 4 attempts: ${feedback.join(" ")}`);
 }

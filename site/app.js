@@ -64,16 +64,19 @@ function stateOf(day) {
 }
 
 // Deterministic per-year shuffle so the boxes are scattered like a real advent calendar.
+// Box sizes depend on the slot (position), not the day (see style.css). Slot 3 is the big box
+// at every screen size, and day 24 always goes there.
+const BIG_SLOT = 2; // zero-based
 function layout(y) {
   let seed = y * 2654435761;
   const rand = () => ((seed = (seed * 1103515245 + 12345) >>> 0) / 2 ** 32);
-  const order = Array.from({ length: LAST_DAY }, (_, i) => i + 1);
+  const order = Array.from({ length: LAST_DAY - 1 }, (_, i) => i + 1);
   for (let i = order.length - 1; i > 0; i--) {
     const j = Math.floor(rand() * (i + 1));
     [order[i], order[j]] = [order[j], order[i]];
   }
-  const wide = new Set(order.filter((d) => d !== 24).slice(0, 4));
-  return { order, wide };
+  order.splice(BIG_SLOT, 0, LAST_DAY);
+  return order;
 }
 
 // ---------- rendering ----------
@@ -81,7 +84,7 @@ const BADGE = { locked: "locked", searching: "scanning…", news: "incident", jo
 
 function render() {
   const cal = $("#calendar");
-  const { order, wide } = layout(year);
+  const order = layout(year);
   const t = now();
   cal.replaceChildren(
     ...order.map((day) => {
@@ -90,8 +93,6 @@ function render() {
       const isToday = t.getUTCFullYear() === year && t.getUTCMonth() === 11 && t.getUTCDate() === day;
       const cls = [
         "box", s,
-        wide.has(day) && "wide",
-        day === 24 && "wide tall",
         isToday && "today",
         (s === "news" || s === "joke") && (opened.has(day) ? "opened" : "unopened"),
       ].filter(Boolean).join(" ");

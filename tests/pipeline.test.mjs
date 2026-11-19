@@ -92,3 +92,38 @@ test("parses RSS and Atom", () => {
   assert.equal(a.url, "https://b.com/y");
   assert.equal(a.published.toISOString(), "2026-12-01T10:00:00.000Z");
 });
+
+test("jokes: fallback pool respects the limits and duplicates are rejected", async () => {
+  const { JOKE_POOL } = await import("../scripts/lib/joke-pool.mjs");
+  const { rejectJoke } = await import("../scripts/lib/curate.mjs");
+  for (const j of JOKE_POOL) assert.equal(rejectJoke(j, []), null, j.punchline);
+  const prev = [{ setup: "Why did X?", punchline: "Because Y!" }];
+  assert.match(rejectJoke({ setup: "why did x", punchline: "new" }, prev), /repeats/);
+  assert.match(rejectJoke({ setup: "Fresh?", punchline: "because y" }, prev), /repeats/);
+  assert.match(rejectJoke({ setup: "Q?", punchline: "one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen" }, []), /words/);
+});
+
+test("jokes are never reused across editions; an exhausted pool keeps searching instead of repeating", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "taoc-jokes-"));
+  const items = path.join(dir, "none.json");
+  fs.writeFileSync(items, "[]");
+  const go = (now) =>
+    execFileSync(process.execPath, ["scripts/update.mjs", "--now", now, "--data-dir", dir, "--fixture", items, "--mock-ai"], {
+      env: { ...process.env, ANTHROPIC_API_KEY: "" },
+      stdio: "pipe",
+    });
+  go("2025-12-13T13:00:00Z"); // 12 quiet days in 2025
+  go("2026-12-13T13:00:00Z"); // 12 quiet days in 2026
+  const setups = (y) =>
+    fs.existsSync(path.join(dir, String(y)))
+      ? fs.readdirSync(path.join(dir, String(y))).map((f) => JSON.parse(fs.readFileSync(path.join(dir, String(y), f), "utf8")).joke.setup)
+      : [];
+  const all = [...setups(2025), ...setups(2026)];
+  assert.equal(all.length, 24);
+  assert.equal(new Set(all).size, 24, "every joke unique across years");
+
+  // 30 pool jokes: only 6 left for 2027, so the other quiet days wait (exit code 1) rather than repeat.
+  assert.throws(() => go("2027-12-25T13:00:00Z"));
+  assert.equal(setups(2027).length, 6);
+  assert.equal(new Set([...all, ...setups(2027)]).size, 30);
+});

@@ -33,7 +33,7 @@ function renderPanel() {
 }
 
 if (enabled) {
-  link.hidden = false;
+  document.getElementById("privacy-wrap").hidden = false;
   link.addEventListener("click", () => { renderPanel(); panel.hidden = false; });
   document.getElementById("consent-close").addEventListener("click", () => { panel.hidden = true; });
   toggle.addEventListener("click", () => {
