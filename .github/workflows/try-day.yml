@@ -1,0 +1,31 @@
+name: Try a day (preview, writes nothing)
+
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Real past date to preview (YYYY-MM-DD, UTC)"
+        required: true
+      joke:
+        description: "Generate a sample joke instead"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  try:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Preview
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DATE: ${{ inputs.date }}
+        run: node scripts/try-day.mjs "$DATE" ${{ inputs.joke && '--joke' || '' }}
