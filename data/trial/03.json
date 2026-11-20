@@ -1,0 +1,22 @@
+{
+  "day": 3,
+  "date": "2026-11-20",
+  "type": "news",
+  "frozenAt": "2026-11-20T03:21:38.984Z",
+  "model": "claude-haiku-5-5",
+  "news": {
+    "notability": 7,
+    "headline": "VMware patches vCenter zero-day that Chinese-linked hackers exploited since September",
+    "summary": "Broadcom has released security updates for a critical VMware vCenter Server authentication bypass. Chinese-linked hackers have been exploiting the flaw as a zero-day since September 2026. Administrators running vCenter should apply the patches promptly.",
+    "chaosTwist": "Somewhere in the North Pole data center, Santa's elves found an uninvited guest hiding in the vCenter sleigh and have been asked to evict it before the reindeer notice.",
+    "naughtyLevel": 4,
+    "category": "exploited-vulnerability",
+    "sources": [
+      {
+        "title": "VMware patches vCenter zero-day exploited in attacks since September",
+        "url": "https://www.bleepingcomputer.com/news/security/vmware-patches-vcenter-zero-day-exploited-in-attacks-since-september/",
+        "outlet": "BleepingComputer"
+      }
+    ]
+  }
+}
