@@ -1,0 +1,22 @@
+{
+  "day": 4,
+  "date": "2026-11-21",
+  "type": "news",
+  "frozenAt": "2026-11-21T12:41:59.940Z",
+  "model": "claude-haiku-5-5",
+  "news": {
+    "notability": 7,
+    "headline": "FBI's nationwide criminal information database reportedly breached again",
+    "summary": "Two sources close to the matter told CNN that the FBI's nationwide criminal information database, a key link between law enforcement agencies, was apparently breached. The report comes amid growing concern over cyberattacks against US government institutions. Details of the intrusion, including who was responsible, were not available in the excerpt.",
+    "chaosTwist": "Someone peeked at the FBI's naughty list before Santa could check it twice, and that's a felony-sized gift.",
+    "naughtyLevel": 4,
+    "category": "breach",
+    "sources": [
+      {
+        "title": "FBI hacked again; criminal information database targeted",
+        "url": "https://databreaches.net/2026/11/21/fbi-hacked-again-criminal-information-database-targeted/",
+        "outlet": "DataBreaches.net"
+      }
+    ]
+  }
+}
