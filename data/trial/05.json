@@ -1,0 +1,22 @@
+{
+  "day": 5,
+  "date": "2026-11-22",
+  "type": "news",
+  "frozenAt": "2026-11-22T09:55:42.183Z",
+  "model": "claude-haiku-5-5",
+  "news": {
+    "notability": 7,
+    "headline": "Optimizely web experimentation flaw used to plant malware on 178 organizations' sites",
+    "summary": "An attacker exploited a vulnerability in Optimizely's web experimentation platform to inject malicious JavaScript into its customers' websites, according to the company. The reported victims include 178 organizations, among them BBC, CNN and Zoom.",
+    "chaosTwist": "Santa's elves were told to run experiments on the nice list, but someone slipped a rogue script into the stocking and every site got a lump of coal.",
+    "naughtyLevel": 4,
+    "category": "supply-chain",
+    "sources": [
+      {
+        "title": "Week in review: Java4Shell proves tricky to exploit, malware planted via Optimizely hits 178 orgs",
+        "url": "https://www.helpnetsecurity.com/2026/11/22/week-in-review-java4shell-proves-tricky-to-exploit-malware-planted-via-optimizely-hits-178-orgs/",
+        "outlet": "Help Net Security"
+      }
+    ]
+  }
+}
