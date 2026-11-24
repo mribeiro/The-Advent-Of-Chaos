@@ -1,0 +1,32 @@
+{
+  "day": 6,
+  "date": "2026-11-23",
+  "type": "news",
+  "frozenAt": "2026-11-24T06:05:53.154Z",
+  "model": "claude-haiku-5-5",
+  "news": {
+    "notability": 7,
+    "headline": "Hackers exploited an Azure API Management flaw to steal credentials at Norwegian energy firms",
+    "summary": "Microsoft warned customers that a vulnerability in the Classic tiers of Azure API Management was exploited to steal stored API credentials. Norwegian authorities linked the flaw to attacks on energy companies, naming Equinor and Skagerak Energi as affected. Other sectors were also reportedly hit, and Microsoft has since closed the flaw.",
+    "chaosTwist": "Someone found the North Pole's spare keys hanging in the cloud, and now the elves must rotate every credential before the sleigh's next delivery run.",
+    "naughtyLevel": 4,
+    "category": "exploited-vulnerability",
+    "sources": [
+      {
+        "title": "Microsoft Azure flaw exploited to steal customers' API credentials",
+        "url": "https://www.bleepingcomputer.com/news/security/microsoft-azure-flaw-exploited-to-steal-customers-api-credentials/",
+        "outlet": "BleepingComputer"
+      },
+      {
+        "title": "Azure Flaw Exploited to Target Secrets at Norwegian Energy Firms",
+        "url": "https://www.securityweek.com/azure-flaw-exploited-to-target-secrets-at-norwegian-energy-firms/",
+        "outlet": "SecurityWeek"
+      },
+      {
+        "title": "Norway says hackers exploited Microsoft security flaw to attack energy firms Equinor, Skagerak Energi",
+        "url": "https://therecord.media/norway-microsoft-cyberattack-equinor",
+        "outlet": "The Record"
+      }
+    ]
+  }
+}
