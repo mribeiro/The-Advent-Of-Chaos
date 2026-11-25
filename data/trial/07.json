@@ -1,0 +1,22 @@
+{
+  "day": 7,
+  "date": "2026-11-24",
+  "type": "news",
+  "frozenAt": "2026-11-25T02:32:32.528Z",
+  "model": "claude-haiku-5-5",
+  "news": {
+    "notability": 7,
+    "headline": "AP source says an unclassified CIA system was breached in a cyberattack",
+    "summary": "According to an AP source, an unclassified CIA system was breached in a cyberattack. It is not yet clear what specific information was compromised or who is responsible.",
+    "chaosTwist": "Santa's naughty list now has a spy agency on it, and even the elves are asking why the reindeer got classified access.",
+    "naughtyLevel": 4,
+    "category": "breach",
+    "sources": [
+      {
+        "title": "An Unclassified CIA System Was Breached in a Cyberattack, AP Source Says",
+        "url": "https://www.securityweek.com/an-unclassified-cia-system-was-breached-in-a-cyberattack-ap-source-says/",
+        "outlet": "SecurityWeek"
+      }
+    ]
+  }
+}
