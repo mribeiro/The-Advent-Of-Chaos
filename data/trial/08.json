@@ -1,0 +1,37 @@
+{
+  "day": 8,
+  "date": "2026-11-25",
+  "type": "news",
+  "frozenAt": "2026-11-25T14:27:19.065Z",
+  "model": "claude-haiku-5-5",
+  "news": {
+    "notability": 7,
+    "headline": "US Treasury's FinCEN takes systems offline after unauthorized access to some systems",
+    "summary": "The Financial Crimes Enforcement Network, a bureau of the US Treasury Department, said it is investigating a cybersecurity incident that gave unauthorized access to a limited subset of its systems. As a precaution, it took some systems offline. FinCEN has extended filing deadlines for affected filers while the investigation continues.",
+    "chaosTwist": "Somewhere an elf is hand-copying suspicious activity reports onto parchment, because the naughty list was apparently filed electronically and then the power went out.",
+    "naughtyLevel": 3,
+    "category": "breach",
+    "sources": [
+      {
+        "title": "U.S. Treasury's Financial Crimes Agency Takes Some Systems Offline After Cyber Intrusion",
+        "url": "https://thehackernews.com/2026/11/us-treasurys-fincen-takes-some-systems.html",
+        "outlet": "The Hacker News"
+      },
+      {
+        "title": "US Treasury’s FinCEN Disconnects Systems Following Cyber Incident",
+        "url": "https://www.securityweek.com/us-treasurys-fincen-disconnects-systems-following-cyber-incident/",
+        "outlet": "SecurityWeek"
+      },
+      {
+        "title": "Treasury’s FinCEN says ‘cybersecurity incident’ includes ‘unauthorized access’ of some systems",
+        "url": "https://databreaches.net/2026/11/25/treasurys-fincen-says-cybersecurity-incident-includes-unauthorized-access-of-some-systems/",
+        "outlet": "DataBreaches.net"
+      },
+      {
+        "title": "US Treasury Investigates Cyber Incident Amid Reported Federal Agency Breaches",
+        "url": "https://www.infosecurity-magazine.com/news/us-treasury-cyber-incident/",
+        "outlet": "Infosecurity Magazine"
+      }
+    ]
+  }
+}
