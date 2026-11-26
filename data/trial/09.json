@@ -1,0 +1,37 @@
+{
+  "day": 9,
+  "date": "2026-11-26",
+  "type": "news",
+  "frozenAt": "2026-11-26T10:57:21.167Z",
+  "model": "claude-haiku-5-5",
+  "news": {
+    "notability": 7,
+    "headline": "1Password breached via hijacked employee GitHub account; customer data and source code stolen",
+    "summary": "An attacker gained access to a 1Password employee's corporate GitHub account and used it to reach some of the company's backend systems. The intruder copied account records for some users and source code from private repositories, according to the company's disclosure. 1Password says customer password vaults and other secrets were not accessed.",
+    "chaosTwist": "The elves left the GitHub door unlocked, and now a stolen sack of source code is sleighing around the internet. The vaults stayed locked, so the cookie jar is safe.",
+    "naughtyLevel": 4,
+    "category": "breach",
+    "sources": [
+      {
+        "title": "1Password Hacked, Customer Data and Source Code Stolen in GitHub Account Breach",
+        "url": "https://thehackernews.com/2026/11/1password-hacked-customer-data-and.html",
+        "outlet": "The Hacker News"
+      },
+      {
+        "title": "1Password Hit by Backend Breach via Hijacked Employee GitHub Account",
+        "url": "https://www.infosecurity-magazine.com/news/1password-github-account-backend/",
+        "outlet": "Infosecurity Magazine"
+      },
+      {
+        "title": "1Password breached through hijacked employee GitHub account, customer names and emails stolen",
+        "url": "https://www.helpnetsecurity.com/2026/11/26/1password-breach-github-customer-records/",
+        "outlet": "Help Net Security"
+      },
+      {
+        "title": "1Password Breach Exposes Customer Data, Internal Source Code",
+        "url": "https://www.securityweek.com/1password-breach-exposes-customer-data-internal-source-code/",
+        "outlet": "SecurityWeek"
+      }
+    ]
+  }
+}
