@@ -1,0 +1,32 @@
+{
+  "day": 10,
+  "date": "2026-11-27",
+  "type": "news",
+  "frozenAt": "2026-11-27T16:43:08.350Z",
+  "model": "claude-haiku-5-5",
+  "news": {
+    "notability": 7,
+    "headline": "SAP confirms cyber incident as reports say hackers tampered with source code via GitHub",
+    "summary": "German software giant SAP has confirmed a security incident after spotting suspicious activity in its IT environment. Reports say attackers used stolen employee tokens on GitHub to copy and alter source code. SAP says it acted urgently to protect its customers.",
+    "chaosTwist": "Santa checked his list twice, but someone had been sneaking into SAP's code repositories with stolen tokens. Even the elves can't gift-wrap a repo that's been tampered with.",
+    "naughtyLevel": 4,
+    "category": "breach",
+    "sources": [
+      {
+        "title": "SAP Confirms Cyberattack, Source Code Reportedly Compromised",
+        "url": "https://www.securityweek.com/sap-confirms-cyberattack-source-code-reportedly-compromised/",
+        "outlet": "SecurityWeek"
+      },
+      {
+        "title": "Software giant SAP confirms cyber incident amid reports of source code breach",
+        "url": "https://therecord.media/sap-germany-cyberattack-github",
+        "outlet": "The Record"
+      },
+      {
+        "title": "SAP confirms security incident after suspicious GitHub activity",
+        "url": "https://www.bleepingcomputer.com/news/security/sap-confirms-security-incident-after-suspicious-github-activity/",
+        "outlet": "BleepingComputer"
+      }
+    ]
+  }
+}
